@@ -354,7 +354,11 @@ fn summarize_min_max(
     }
 }
 
-pub(crate) async fn fetch_parquet_metadata(
+/// Fetches parquet metadata from ObjectStore for given object
+///
+/// This component is a subject to **change** in near future and is exposed for low level integrations
+/// through [ParquetFileReaderFactory].
+pub async fn fetch_parquet_metadata(
     store: &dyn ObjectStore,
     meta: &ObjectMeta,
     size_hint: Option<usize>,
@@ -522,8 +526,13 @@ pub(crate) mod test_util {
     use super::*;
     use crate::test::object_store::local_unpartitioned_file;
     use arrow::record_batch::RecordBatch;
+    use bytes::Bytes;
+    use object_store::memory::InMemory;
+    use object_store::path::Path;
     use parquet::arrow::ArrowWriter;
     use parquet::file::properties::WriterProperties;
+    use std::io::Cursor;
+    use std::time::SystemTime;
     use tempfile::NamedTempFile;
 
     pub async fn store_parquet(
